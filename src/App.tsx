@@ -289,8 +289,18 @@ function App() {
     }
   };
 
+  // Determine current voice mode state - priority order: loading > speaking > listening > idle
+  const getCurrentVoiceState = () => {
+    if (isLoading) return 'loading';
+    if (isSpeaking) return 'speaking';
+    if (isListening) return 'listening';
+    return 'idle';
+  };
+
   // Voice Mode Full Screen Component
   if (isVoiceMode) {
+    const currentState = getCurrentVoiceState();
+
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
         {/* Header */}
@@ -325,9 +335,9 @@ function App() {
             </button>
           </div>
 
-          {/* Visual Feedback */}
+          {/* Visual Feedback - Only show one state at a time */}
           <div className="text-center flex flex-col items-center">
-            {isListening && (
+            {currentState === 'listening' && (
               <div className="mb-6 flex flex-col items-center">
                 <img 
                   src="/dinle.gif" 
@@ -348,7 +358,7 @@ function App() {
               </div>
             )}
             
-            {isSpeaking && (
+            {currentState === 'speaking' && (
               <div className="mb-6 flex flex-col items-center">
                 <img 
                   src="/konus.gif" 
@@ -363,22 +373,8 @@ function App() {
                 </p>
               </div>
             )}
-            
-            {!isListening && !isSpeaking && !isLoading && (
-              <div className="mb-6 flex flex-col items-center">
-                <div className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 lg:w-84 lg:h-84 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-2xl">
-                  <Mic className="w-18 h-18 sm:w-24 sm:h-24 lg:w-30 lg:h-30 text-gray-400" />
-                </div>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-600 mt-6">
-                  ⏳ Hazır...
-                </p>
-                <p className="text-sm sm:text-base text-gray-500 mt-2">
-                  Konuşmaya başlamak için bekliyor
-                </p>
-              </div>
-            )}
 
-            {isLoading && (
+            {currentState === 'loading' && (
               <div className="mb-6 flex flex-col items-center">
                 <div className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 lg:w-84 lg:h-84 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-2xl">
                   <div className="flex space-x-2">
@@ -392,6 +388,20 @@ function App() {
                 </p>
                 <p className="text-sm sm:text-base text-blue-500 mt-2">
                   Yanıt hazırlanıyor
+                </p>
+              </div>
+            )}
+            
+            {currentState === 'idle' && (
+              <div className="mb-6 flex flex-col items-center">
+                <div className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 lg:w-84 lg:h-84 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-2xl">
+                  <Mic className="w-18 h-18 sm:w-24 sm:h-24 lg:w-30 lg:h-30 text-gray-400" />
+                </div>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-600 mt-6">
+                  ⏳ Hazır...
+                </p>
+                <p className="text-sm sm:text-base text-gray-500 mt-2">
+                  Konuşmaya başlamak için bekliyor
                 </p>
               </div>
             )}
